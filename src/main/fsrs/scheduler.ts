@@ -162,6 +162,78 @@ export function getDueCards(limit: number = 50): Card[] {
   return rows.map(rowToCard)
 }
 
+export function undoReview(cardId: number): Card | null {
+  const db = getDb()
+
+  // Find the most recent review log for this card
+  const lastLog = db
+    .prepare('SELECT * FROM review_logs WHERE card_id = ? ORDER BY review_at DESC LIMIT 1')
+    .get(cardId) as Record<string, unknown> | undefined
+
+  if (!lastLog) return null
+
+  const logId = lastLog.id as number
+  const logState = lastLog.state as number // state *before* the review
+  const durationMs = lastLog.duration_ms as number
+  const reviewDate = (lastLog.review_at as string).split('T')[0]
+
+  // Find the previous review log (if any) to restore card to that state
+  const prevLog = db
+    .prepare('SELECT * FROM review_logs WHERE card_id = ? AND id < ? ORDER BY review_at DESC LIMIT 1')
+    .get(cardId, logId) as Record<string, unknown> | undefined
+
+  if (prevLog) {
+    // Restore card to the state after the previous review by re-fetching
+    // Since we stored the pre-review state in the log, we need the card's state from before *this* review
+    // The simplest reliable approach: restore card to the state captured in the log
+    db.prepare(`
+      UPDATE cards SET
+        state = ?,
+        stability = 0,
+        difficulty = 0,
+        due = ?,
+        last_review = ?,
+        reps = CASE WHEN reps > 0 THEN reps - 1 ELSE 0 END,
+        lapses = CASE WHEN ? IN (3) AND lapses > 0 THEN lapses - 1 ELSE lapses END,
+        elapsed_days = 0,
+        scheduled_days = 0
+      WHERE id = ?
+    `).run(
+      logState,
+      prevLog.review_at as string,
+      prevLog.review_at as string,
+      logState,
+      cardId
+    )
+  } else {
+    // No previous review — card was New before this review, reset to New state
+    db.prepare(`
+      UPDATE cards SET
+        state = 0, stability = 0, difficulty = 0,
+        due = NULL, last_review = NULL, reps = 0, lapses = 0,
+        elapsed_days = 0, scheduled_days = 0
+      WHERE id = ?
+    `).run(cardId)
+  }
+
+  // Delete the review log
+  db.prepare('DELETE FROM review_logs WHERE id = ?').run(logId)
+
+  // Decrement daily stats
+  const isNewCard = logState === CardState.New
+  db.prepare(`
+    UPDATE daily_stats SET
+      cards_reviewed = CASE WHEN cards_reviewed > 0 THEN cards_reviewed - 1 ELSE 0 END,
+      cards_new = CASE WHEN ? AND cards_new > 0 THEN cards_new - 1 ELSE cards_new END,
+      time_spent_ms = CASE WHEN time_spent_ms > ? THEN time_spent_ms - ? ELSE 0 END
+    WHERE date = ?
+  `).run(isNewCard ? 1 : 0, durationMs, durationMs, reviewDate)
+
+  // Return the updated card
+  const row = db.prepare('SELECT * FROM cards WHERE id = ?').get(cardId) as Record<string, unknown>
+  return row ? rowToCard(row) : null
+}
+
 export function getNewCardForFSRS(): FSRSCard {
   return createEmptyCard()
 }

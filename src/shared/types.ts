@@ -141,6 +141,7 @@ export type ViewType =
   | 'graph'
   | 'ingest'
   | 'search'
+  | 'stats'
 
 export interface NavigationState {
   view: ViewType

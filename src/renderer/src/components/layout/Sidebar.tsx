@@ -10,6 +10,7 @@ import {
   GraduationCap,
   Network,
   Plus,
+  BarChart3,
   ChevronRight,
   ChevronDown
 } from 'lucide-react'
@@ -79,6 +80,12 @@ export function Sidebar(): React.JSX.Element {
             label="Knowledge Graph"
             active={view === 'graph'}
             onClick={() => navigate('graph')}
+          />
+          <SidebarButton
+            icon={BarChart3}
+            label="Statistics"
+            active={view === 'stats'}
+            onClick={() => navigate('stats')}
           />
           <SidebarButton
             icon={Plus}

@@ -17,6 +17,7 @@ const corpusApi = {
   // Review
   processRating: (cardId: number, rating: number, durationMs: number) =>
     ipcRenderer.invoke(IPC_CHANNELS.REVIEW_PROCESS_RATING, cardId, rating, durationMs),
+  undoReview: (cardId: number) => ipcRenderer.invoke(IPC_CHANNELS.REVIEW_UNDO, cardId),
 
   // Navigation
   getPillars: () => ipcRenderer.invoke(IPC_CHANNELS.PILLARS_GET_ALL),

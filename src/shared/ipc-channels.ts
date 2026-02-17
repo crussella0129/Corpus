@@ -13,6 +13,7 @@ export const IPC_CHANNELS = {
   // Review
   REVIEW_PROCESS_RATING: 'review:process-rating',
   REVIEW_GET_SESSION: 'review:get-session',
+  REVIEW_UNDO: 'review:undo',
 
   // Notes / Topics
   TOPICS_GET_ALL: 'topics:get-all',

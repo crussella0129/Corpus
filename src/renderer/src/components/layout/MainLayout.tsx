@@ -3,7 +3,9 @@ import { Sidebar } from './Sidebar'
 import { TopBar } from './TopBar'
 import { useNavigationStore } from '../../stores/navigationStore'
 import { Dashboard } from '../dashboard/Dashboard'
+import { StatsView } from '../dashboard/StatsView'
 import { ReviewSession } from '../review/ReviewSession'
+import { TopicView } from '../curriculum/TopicView'
 import type { DashboardData } from '@shared/types'
 
 export function MainLayout(): React.JSX.Element {
@@ -42,6 +44,10 @@ function ViewRouter(): React.JSX.Element {
       return <PillarPlaceholder pillarId={pillarId} />
     case 'domain':
       return <DomainPlaceholder domainId={domainId} />
+    case 'topic':
+      return <TopicView />
+    case 'stats':
+      return <StatsView />
     case 'graph':
       return <PlaceholderView title="Knowledge Graph" description="Interactive concept map — coming in Sprint 4" />
     case 'ingest':
@@ -86,6 +92,7 @@ function PillarPlaceholder({ pillarId }: { pillarId: string | null }): React.JSX
 
 function DomainPlaceholder({ domainId }: { domainId: string | null }): React.JSX.Element {
   const [topics, setTopics] = useState<{ id: string; name: string }[]>([])
+  const { pillarId, navigate } = useNavigationStore()
 
   useEffect(() => {
     if (domainId) {
@@ -101,13 +108,14 @@ function DomainPlaceholder({ domainId }: { domainId: string | null }): React.JSX
       {topics.length > 0 ? (
         <div className="space-y-2">
           {topics.map((topic) => (
-            <div
+            <button
               key={topic.id}
-              className="bg-bg-secondary border border-border rounded-lg p-3"
+              onClick={() => navigate('topic', { pillarId: pillarId!, domainId: domainId!, topicId: topic.id })}
+              className="w-full text-left bg-bg-secondary border border-border rounded-lg p-3 hover:border-accent transition-colors"
             >
               <h3 className="text-sm font-medium text-text-primary">{topic.name}</h3>
               <p className="text-xs text-text-muted mt-1">{topic.id}</p>
-            </div>
+            </button>
           ))}
         </div>
       ) : (
