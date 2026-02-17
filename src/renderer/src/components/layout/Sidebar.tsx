@@ -51,7 +51,7 @@ export function Sidebar(): React.JSX.Element {
   }
 
   return (
-    <aside className="w-64 bg-bg-secondary border-r border-border flex flex-col h-full">
+    <aside className="w-72 shrink-0 bg-bg-secondary border-r border-border flex flex-col h-full">
       {/* Logo area */}
       <div className="p-4 border-b border-border">
         <h1 className="text-xl font-bold text-text-primary tracking-tight">Corpus</h1>
@@ -118,7 +118,7 @@ export function Sidebar(): React.JSX.Element {
                 </button>
 
                 {isExpanded && domains.length > 0 && (
-                  <div className="ml-5 mt-0.5 mb-1">
+                  <div className="ml-8 mt-0.5 mb-1 border-l border-border pl-2">
                     {domains.map((domain) => (
                       <button
                         key={domain.id}
@@ -128,10 +128,10 @@ export function Sidebar(): React.JSX.Element {
                             domainId: domain.id
                           })
                         }
-                        className="w-full text-left px-3 py-1 text-xs text-text-secondary hover:text-text-primary hover:bg-bg-hover rounded transition-colors truncate"
+                        className="w-full text-left flex items-center justify-between px-2 py-1 text-xs text-text-secondary hover:text-text-primary hover:bg-bg-hover rounded transition-colors"
                       >
-                        {domain.name}
-                        <span className="ml-1 text-text-muted">T{domain.tier}</span>
+                        <span className="truncate">{domain.name}</span>
+                        <span className="shrink-0 ml-2 text-text-muted opacity-60">T{domain.tier}</span>
                       </button>
                     ))}
                   </div>

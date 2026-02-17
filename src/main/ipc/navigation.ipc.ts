@@ -24,7 +24,7 @@ export function registerNavigationHandlers(): void {
   ipcMain.handle(IPC_CHANNELS.DOMAINS_GET_ALL, () => {
     const db = getDb()
     const rows = db
-      .prepare('SELECT * FROM domains ORDER BY sort_order')
+      .prepare('SELECT * FROM domains ORDER BY tier ASC, sort_order ASC')
       .all() as Record<string, unknown>[]
     return rows.map(rowToDomain)
   })
@@ -32,7 +32,7 @@ export function registerNavigationHandlers(): void {
   ipcMain.handle(IPC_CHANNELS.DOMAINS_GET_BY_PILLAR, (_event, pillarId: string) => {
     const db = getDb()
     const rows = db
-      .prepare('SELECT * FROM domains WHERE pillar_id = ? ORDER BY sort_order')
+      .prepare('SELECT * FROM domains WHERE pillar_id = ? ORDER BY tier ASC, sort_order ASC')
       .all(pillarId) as Record<string, unknown>[]
     return rows.map(rowToDomain)
   })

@@ -46,19 +46,21 @@ export function TopBar({ streak, reviewedToday }: TopBarProps): React.JSX.Elemen
   }
 
   return (
-    <header className="h-12 bg-bg-secondary border-b border-border flex items-center px-4 gap-4">
+    <header className="h-12 bg-bg-secondary border-b border-border flex items-center px-6 gap-6">
       {/* Search */}
       <div className="relative flex-1 max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => handleSearch(e.target.value)}
-          onFocus={() => searchResults.length > 0 && setShowResults(true)}
-          onBlur={() => setTimeout(() => setShowResults(false), 200)}
-          placeholder="Search cards, notes, topics..."
-          className="w-full bg-bg-tertiary border border-border rounded-md pl-9 pr-3 py-1.5 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent"
-        />
+        <div className="flex items-center gap-2 bg-bg-tertiary border border-border rounded-md px-3 py-1.5 focus-within:border-accent">
+          <Search className="w-4 h-4 text-text-muted shrink-0" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => handleSearch(e.target.value)}
+            onFocus={() => searchResults.length > 0 && setShowResults(true)}
+            onBlur={() => setTimeout(() => setShowResults(false), 200)}
+            placeholder="Search cards, notes, topics..."
+            className="flex-1 bg-transparent text-sm text-text-primary placeholder:text-text-muted focus:outline-none"
+          />
+        </div>
 
         {showResults && searchResults.length > 0 && (
           <div className="absolute top-full left-0 right-0 mt-1 bg-bg-secondary border border-border rounded-md shadow-lg z-50 max-h-64 overflow-y-auto">
